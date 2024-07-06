@@ -1,4 +1,4 @@
-const mongoose = requiere('mongoose');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken')
 const passwordComplexity = require("joi-password-complexity");
 const Joi = require('joi');
