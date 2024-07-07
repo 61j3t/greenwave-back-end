@@ -33,7 +33,6 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-
 // Local Strategy
 passport.use(new LocalStrategy({
   usernameField: 'email'
