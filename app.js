@@ -18,6 +18,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -33,11 +34,9 @@ mongoose.connect(process.env.MONGO_URI, {
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
 
-const PORT = process.env.PORT || 3000;
+// start server
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

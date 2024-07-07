@@ -21,25 +21,34 @@ passport.use(new GoogleStrategy({
   callbackURL: '/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   const { id, emails, displayName } = profile;
-  let user = await User.findOne({ googleId: id });
-  if (!user) {
-    user = new User({ googleId: id, email: emails[0].value, username: displayName, role: 'user' });
-    await user.save();
+  try {
+    let user = await User.findOne({ googleId: id });
+    if (!user) {
+      user = new User({ googleId: id, email: emails[0].value, username: displayName, role: 'user' });
+      await user.save();
+    }
+    done(null, user);
+  } catch (err) {
+    done(err);
   }
-  done(null, user);
 }));
+
 
 // Local Strategy
 passport.use(new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, done) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    return done(null, false, { message: 'User not found' });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return done(null, false, { message: 'User not found' });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return done(null, false, { message: 'Incorrect password' });
+    }
+    done(null, user);
+  } catch (err) {
+    done(err);
   }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return done(null, false, { message: 'Incorrect password' });
-  }
-  done(null, user);
 }));
