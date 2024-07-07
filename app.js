@@ -29,7 +29,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 const authRoutes = require('./routes/auth');
+const eventRoutes = require('./routes/event');
 app.use('/auth', authRoutes);
+app.use('/events', eventRoutes);
 
 // Start server
 const PORT = 3001;

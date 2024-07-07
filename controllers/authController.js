@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error('Error sending email:', err);
-        return res.status(500).json({ msg: 'Failed to send verification email', error: err.message });
+        return res.status(500).json({ msg: 'Failed to send verification email' });
       }
       res.status(201).json({ msg: 'User registered successfully. Check your email for verification code.' });
     });

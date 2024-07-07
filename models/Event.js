@@ -17,6 +17,20 @@ const EventSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  objective: {
+    time: {
+      type: Number,
+      required: true
+    },
+    quantity: {
+      type: Number,
+      required: true
+    },
+    surface: {
+      type: Number,
+      required: true
+    }
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
