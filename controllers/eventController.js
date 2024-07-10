@@ -1,10 +1,11 @@
 const Event = require('../models/Event');
 
 exports.createEvent = async (req, res) => {
-    const { title, description, date, location, objective, createdBy } = req.body;
+    const { title, category, description, date, location, objective, createdBy } = req.body;
     try {
       const event = new Event({
         title,
+        category,
         description,
         date,
         location,
@@ -40,7 +41,7 @@ exports.getEventById = async (req, res) => {
 };
 
 exports.updateEvent = async (req, res) => {
-  const { title, description, date, location, objective } = req.body;
+  const { title, category, description, date, location, objective } = req.body;
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
@@ -52,6 +53,7 @@ exports.updateEvent = async (req, res) => {
     // }
 
     event.title = title || event.title;
+    event.category = category || event.category;
     event.description = description || event.description;
     event.date = date || event.date;
     event.location = location || event.location;
