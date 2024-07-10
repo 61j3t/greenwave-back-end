@@ -24,14 +24,17 @@ app.use(passport.session());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/event');
+const articleRoutes = require('./routes/article');
+
 app.use('/auth', authRoutes);
 app.use('/events', eventRoutes);
+app.use('/articles', articleRoutes);
 
 // Start server
 const PORT = 3001;
