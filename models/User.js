@@ -16,20 +16,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  googleId: {
-    type: String
-  },
   role: {
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
-  },
-  verificationCode: {
-    type: String,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false
   }
 });
 

@@ -4,24 +4,27 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// Google Auth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-router.get('/google/callback', passport.authenticate('google', {
-  failureRedirect: '/login',
-  successRedirect: '/'
-}));
-
-// Register
 router.post('/register', authController.register);
+router.post('/login', (req, res, next) => {
+  console.log('Login request received with email:', req.body.email); // Log the email from the request
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      console.log('User not found:', info); // Log the info object
+      return res.status(401).json({ msg: 'Authentication failed', info });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.json({ msg: 'Logged in successfully' });
+    });
+  })(req, res, next);
+});
 
-// Email Verification
-router.post('/verify-email', authController.verifyEmail);
 
-// Login
-router.post('/login', passport.authenticate('local'), authController.login);
-
-// Logout
 router.get('/logout', authController.logout);
 
 module.exports = router;
