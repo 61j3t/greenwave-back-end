@@ -4,10 +4,48 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// Register route
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User created
+ *       400:
+ *         description: Invalid input
+ */
 router.post('/register', authController.register);
 
-// Login route
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login a user
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - email
+ *               - password
+ *     responses:
+ *       200:
+ *         description: User logged in
+ *       401:
+ *         description: Authentication failed
+ */
 router.post('/login', (req, res, next) => {
   console.log('Login request received with email:', req.body.email); // Log the email from the request
   passport.authenticate('local', (err, user, info) => {
@@ -30,7 +68,15 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-// Logout route
+/**
+ * @swagger
+ * /auth/logout:
+ *   get:
+ *     summary: Logout a user
+ *     responses:
+ *       200:
+ *         description: User logged out
+ */
 router.get('/logout', authController.logout);
 
 module.exports = router;
