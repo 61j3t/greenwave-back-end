@@ -9,5 +9,9 @@ router.get('/', eventController.getAllEvents);
 router.get('/:id', eventController.getEventById);
 router.put('/:id', eventController.updateEvent);
 router.delete('/:id', eventController.deleteEvent);
+router.post('/:id/participate', eventController.participateEvent);
+router.post('/:id/cancelParticipation', eventController.cancelParticipation);
+
+
 
 module.exports = router;

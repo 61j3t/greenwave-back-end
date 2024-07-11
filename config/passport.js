@@ -23,11 +23,19 @@ passport.use(new LocalStrategy({
       console.log('User not found for email:', email); // Log the email if user is not found
       return done(null, false, { message: 'User not found' });
     }
+
+    console.log('Stored password:', user.password);
+    console.log('Input password:', password);
+
+
+
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match result:', isMatch);
+
     if (!isMatch) {
-      console.log('Incorrect password for email:', email); // Log the email and password mismatch
       return done(null, false, { message: 'Incorrect password' });
     }
+
     console.log('User authenticated successfully for email:', email);
     done(null, user);
   } catch (err) {
@@ -35,7 +43,5 @@ passport.use(new LocalStrategy({
     done(err);
   }
 }));
-
-
 
 module.exports = passport;

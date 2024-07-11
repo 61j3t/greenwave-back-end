@@ -35,6 +35,15 @@ const EventSchema = new mongoose.Schema({
       required: true
     }
   },
+  status: {
+    type: String,
+    required: true,
+    default: 'à venir'
+  },
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
