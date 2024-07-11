@@ -11,7 +11,7 @@ router.put('/:id', eventController.updateEvent);
 router.delete('/:id', eventController.deleteEvent);
 router.post('/:id/participate', eventController.participateEvent);
 router.post('/:id/cancelParticipation', eventController.cancelParticipation);
-
+router.post('/:eventId/toggleLight/:team', eventController.toggleLight);
 
 
 module.exports = router;

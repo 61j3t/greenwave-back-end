@@ -20,7 +20,7 @@ exports.createArticle = async (req, res) => {
 
 exports.getAllArticles = async (req, res) => {
   try {
-    const articles = await Article.find();
+    const articles = await Article.find().populate('owner', 'username  -_id');
     res.status(200).json(articles);
   } catch (error) {
     res.status(500).json({ msg: 'Server error', error: error.message });
@@ -29,7 +29,7 @@ exports.getAllArticles = async (req, res) => {
 
 exports.getArticleById = async (req, res) => {
   try {
-    const article = await Article.findById(req.params.id);
+    const article = await Article.findById(req.params.id).populate('owner', 'username  -_id');
     if (!article) {
       return res.status(404).json({ msg: 'Article not found' });
     }

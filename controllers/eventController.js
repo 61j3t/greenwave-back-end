@@ -174,3 +174,41 @@ exports.cancelParticipation = async (req, res) => {
     res.status(500).json({ msg: 'Server error', error: error.message });
   }
 };
+
+
+// Function to toggle the light state for a team
+exports.toggleLight = async (req, res) => {
+  const { eventId, team } = req.params;
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    // Check if event status allows light toggling
+    if (event.status !== 'En cours') {
+      return res.status(400).json({ msg: 'Event is not in progress' });
+    }
+
+    // Ensure that the light toggling can only happen during the first step
+    if (event.currentStepIndex !== 0) {
+      return res.status(400).json({ msg: 'Light toggling can only happen during the first step of the game' });
+    }
+
+    // Toggle light state
+    if (team === 'teamA') {
+      event.teamA.lightStatus = event.teamA.lightStatus === 'red' ? 'green' : 'red';
+    } else if (team === 'teamB') {
+      event.teamB.lightStatus = event.teamB.lightStatus === 'red' ? 'green' : 'red';
+    } else {
+      return res.status(400).json({ msg: 'Invalid team' });
+    }
+
+    await event.save();
+
+    res.status(200).json({ msg: `Light state for ${team} updated successfully`, teamA: event.teamA, teamB: event.teamB });
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error', error: error.message });
+  }
+};
