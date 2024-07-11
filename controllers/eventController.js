@@ -32,10 +32,10 @@ exports.createEvent = async (req, res) => {
 exports.getAllEvents = async (req, res) => {
   try {
     const events = await Event.find()
-      .populate('createdBy', 'username email')
-      .populate('participants', 'username email')
-      .populate('teamA.participants', 'username email')
-      .populate('teamB.participants', 'username email');
+      .populate('createdBy', 'username  -_id')
+      .populate('participants', 'username  -_id')
+      .populate('teamA.participants', 'username  -_id')
+      .populate('teamB.participants', 'username  -_id');
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ msg: 'Server error', error: error.message });
@@ -45,10 +45,10 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
-      .populate('createdBy', 'username email')
-      .populate('participants', 'username email')
-      .populate('teamA.participants', 'username email')
-      .populate('teamB.participants', 'username email');
+      .populate('createdBy', 'username  -_id')
+      .populate('participants', 'username  -_id')
+      .populate('teamA.participants', 'username  -_id')
+      .populate('teamB.participants', 'username  -_id');
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
@@ -208,6 +208,34 @@ exports.toggleLight = async (req, res) => {
     await event.save();
 
     res.status(200).json({ msg: `Light state for ${team} updated successfully`, teamA: event.teamA, teamB: event.teamB });
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error', error: error.message });
+  }
+};
+
+
+exports.updateTeamQuantity = async (req, res) => {
+  const { teamId, newQuantity } = req.body;
+  const eventId = req.params.id;
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    // Validate teamId and update quantity
+    if (teamId === 'teamA') {
+      event.teamA.quantity = newQuantity;
+    } else if (teamId === 'teamB') {
+      event.teamB.quantity = newQuantity;
+    } else {
+      return res.status(400).json({ msg: 'Invalid team identifier' });
+    }
+
+    await event.save();
+
+    res.status(200).json({ msg: 'Team quantity updated successfully', event });
   } catch (error) {
     res.status(500).json({ msg: 'Server error', error: error.message });
   }
