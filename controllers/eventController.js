@@ -14,7 +14,9 @@ exports.createEvent = async (req, res) => {
       objective,
       status,
       participants: [createdBy], // Include createdBy in participants array
-      createdBy
+      createdBy,
+      teamA: { participants: [createdBy], quantity: 0 }, // Initial teamA setup with createdBy
+      teamB: { participants: [], quantity: 0 } // Initial teamB setup
     });
 
     // Save the event to the database
@@ -29,7 +31,11 @@ exports.createEvent = async (req, res) => {
 
 exports.getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find().populate('createdBy', 'username email').populate('participants', 'username email');
+    const events = await Event.find()
+      .populate('createdBy', 'username email')
+      .populate('participants', 'username email')
+      .populate('teamA.participants', 'username email')
+      .populate('teamB.participants', 'username email');
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ msg: 'Server error', error: error.message });
@@ -38,7 +44,11 @@ exports.getAllEvents = async (req, res) => {
 
 exports.getEventById = async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id).populate('createdBy', 'username email').populate('participants', 'username email');
+    const event = await Event.findById(req.params.id)
+      .populate('createdBy', 'username email')
+      .populate('participants', 'username email')
+      .populate('teamA.participants', 'username email')
+      .populate('teamB.participants', 'username email');
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
@@ -55,10 +65,6 @@ exports.updateEvent = async (req, res) => {
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
-
-    // if (event.createdBy.toString() !== req.user._id.toString()) {
-    //   return res.status(403).json({ msg: 'Unauthorized' });
-    // }
 
     event.title = title || event.title;
     event.category = category || event.category;
@@ -90,7 +96,6 @@ exports.deleteEvent = async (req, res) => {
   }
 };
 
-
 exports.participateEvent = async (req, res) => {
   const userId = req.body.userId; // Assuming userId is sent in the request body
   const eventId = req.params.id;
@@ -111,7 +116,16 @@ exports.participateEvent = async (req, res) => {
       return res.status(400).json({ msg: 'User is already participating in this event' });
     }
 
+    // Add user to participants array
     event.participants.push(userId);
+
+    // Assign the user to a team (alternating logic or any other logic you want to apply)
+    if (event.teamA.participants.length <= event.teamB.participants.length) {
+      event.teamA.participants.push(userId);
+    } else {
+      event.teamB.participants.push(userId);
+    }
+
     await event.save();
 
     res.status(200).json({ msg: 'User participated in the event successfully' });
@@ -119,6 +133,9 @@ exports.participateEvent = async (req, res) => {
     res.status(500).json({ msg: 'Server error', error: error.message });
   }
 };
+
+
+
 
 exports.cancelParticipation = async (req, res) => {
   const userId = req.body.userId; // Assuming userId is sent in the request body
@@ -140,10 +157,17 @@ exports.cancelParticipation = async (req, res) => {
       return res.status(400).json({ msg: 'User is not participating in this event' });
     }
 
-    // Remove user from participants array using Mongoose pull method
-    await Event.findByIdAndUpdate(eventId, {
-      $pull: { participants: userId }
-    });
+    // Remove user from participants array
+    event.participants = event.participants.filter(participant => participant.toString() !== userId);
+
+    // Remove user from teamA or teamB
+    if (event.teamA.participants.includes(userId)) {
+      event.teamA.participants = event.teamA.participants.filter(member => member.toString() !== userId);
+    } else if (event.teamB.participants.includes(userId)) {
+      event.teamB.participants = event.teamB.participants.filter(member => member.toString() !== userId);
+    }
+
+    await event.save();
 
     res.status(200).json({ msg: 'User cancelled participation in the event successfully' });
   } catch (error) {
